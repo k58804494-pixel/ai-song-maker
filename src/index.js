@@ -82,7 +82,7 @@ class AURAVOX {
       mode: this.config.mode,
       safetyLevel: this.config.safetyLevel,
       memoryNodes: this.memoryGraph.getNodeCount(),
-      orchestrator: this.orchestrator.getStatus()
+      orchestrator: this.orchestrator.getStats()
     };
   }
 

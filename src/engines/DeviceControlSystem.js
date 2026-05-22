@@ -68,7 +68,11 @@ class DeviceControlSystem {
     
     // Use safety governor if available
     if (this.safetyGovernor) {
-      const governorResult = this.safetyGovernor.isSafe(command);
+      const isSafeResult = this.safetyGovernor.isSafe(command);
+      // Handle both boolean and object return types
+      const governorResult = typeof isSafeResult === 'boolean' 
+        ? { safe: isSafeResult } 
+        : isSafeResult;
       if (!governorResult.safe) {
         return { safe: false, reason: 'safety_governor' };
       }

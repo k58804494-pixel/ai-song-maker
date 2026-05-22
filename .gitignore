@@ -1,44 +1,33 @@
 ```
-# State files
-.auravox-state.json
-
 # Dependencies
 node_modules/
 
 # Build artifacts
 dist/
 build/
-target/
+*.js.map
 
-# Virtual environments
-.venv/
-venv/
-__pycache__/
-*.pyc
+# Environment
+.env
+.env.local
+.env.*
 
 # Logs
 *.log
 
-# Environment files
-.env
-.env.local
-*.env.*
+# Temporary files
+*.tmp
+*.swp
 
-# Editors
+# IDE
 .vscode/
 .idea/
 
-# OS generated files
+# OS
 .DS_Store
 Thumbs.db
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
+# State files
+*.state.json
 
-# Cache directories
-.mypy_cache/
-.pytest_cache/
-.gradle/
 ```

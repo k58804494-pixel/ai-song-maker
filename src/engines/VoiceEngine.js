@@ -119,7 +119,18 @@ class VoiceEngine {
    */
   async textToSpeech(text, options = {}) {
     const startTime = Date.now();
-    const voice = this.voices.get(this.currentVoice) || this.voices.get('default');
+    let voice = this.voices.get(this.currentVoice);
+    
+    // Fallback to default voice if current voice not found
+    if (!voice) {
+      voice = this.voices.get('default');
+    }
+    
+    // Final fallback if no voices registered
+    if (!voice) {
+      voice = { id: 'default', name: 'AURAVOX Standard', emotional: true };
+    }
+    
     const emotion = options.emotion || this.emotionalState;
     
     // Apply emotional tone adaptation
@@ -130,7 +141,7 @@ class VoiceEngine {
       success: true,
       audioData: '[Generated audio buffer]',
       text: adaptedText,
-      voice: voice.name,
+      voice: voice.name || 'AURAVOX Standard',
       emotion: emotion,
       prosody: prosody,
       duration: adaptedText.length * 0.05, // Estimate duration
@@ -172,10 +183,13 @@ class VoiceEngine {
       neutral: { pitch: '0%', rate: '1.0x', volume: 'medium' }
     };
     
+    // Ensure voice has required properties
+    const safeVoice = voice || { id: 'default', emotional: true };
+    
     return {
       base: prosodies[emotion] || prosodies.neutral,
-      voice: voice.id,
-      emotional: voice.emotional
+      voice: safeVoice.id || 'default',
+      emotional: safeVoice.emotional || true
     };
   }
 

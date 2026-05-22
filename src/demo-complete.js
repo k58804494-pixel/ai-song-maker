@@ -6,7 +6,7 @@
 import { ReasoningEngine, VisionEngine, VoiceEngine, DeviceControlSystem, MediaGenerationEngine, CharacterIdentityEngine } from './engines/index.js';
 import MemoryGraphEngine from './memory/MemoryGraphEngine.js';
 import OrchestratorCore from './orchestrator/OrchestratorCore.js';
-import PluginSystem from './plugins/PluginSystem.js';
+import PluginSystem, { builtinPlugins } from './plugins/PluginSystem.js';
 import SafetyGovernor from './safety/SafetyGovernor.js';
 
 async function runCompleteDemo() {
@@ -20,38 +20,41 @@ async function runCompleteDemo() {
   safetyGovernor.setLevel('STANDARD');
   
   const memoryEngine = new MemoryGraphEngine();
-  await memoryEngine.initialize();
+  await memoryEngine.load();
   
   const pluginSystem = new PluginSystem();
-  await pluginSystem.initialize();
+  // Register built-in plugins
+  pluginSystem.register(builtinPlugins[0]);
+  pluginSystem.register(builtinPlugins[1]);
+  pluginSystem.register(builtinPlugins[2]);
   
   const orchestrator = new OrchestratorCore({
     safetyGovernor,
     memoryEngine,
     pluginSystem
   });
-  await orchestrator.initialize();
+  // Orchestrator initializes automatically in constructor
 
   // Initialize all engines
   console.log('\n🔧 INITIALIZING ENGINES...\n');
   
   const reasoningEngine = new ReasoningEngine();
-  await reasoningEngine.initialize();
+  // reasoningEngine auto-initializes
   
   const visionEngine = new VisionEngine();
-  await visionEngine.initialize();
+  // visionEngine auto-initializes
   
   const voiceEngine = new VoiceEngine();
-  await voiceEngine.initialize();
+  // voiceEngine auto-initializes
   
   const deviceControl = new DeviceControlSystem(safetyGovernor);
-  await deviceControl.initialize();
+  // deviceControl auto-initializes
   
   const mediaEngine = new MediaGenerationEngine();
-  await mediaEngine.initialize();
+  // mediaEngine auto-initializes
   
   const characterEngine = new CharacterIdentityEngine();
-  await characterEngine.initialize();
+  // characterEngine auto-initializes
 
   console.log('\n✅ All systems initialized!\n');
   console.log('=' .repeat(60));
