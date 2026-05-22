@@ -6,18 +6,21 @@ __pycache__/
 *.obj
 dist/
 build/
+target/
 
 # Dependencies
 .venv/
 venv/
 node_modules/
-target/
-.gradle/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Logs and temp files
 *.log
 *.tmp
 *.swp
+*.swo
 
 # Environment
 .env
@@ -27,6 +30,8 @@ target/
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # Coverage reports
 coverage/
@@ -34,18 +39,32 @@ htmlcov/
 .coverage
 
 # Python specific
+*.pyc
+__pycache__/
 *.pyo
 *.pyd
-*.so
-*.egg-info/
 .Python
-pip-log.txt
-pip-delete-this-directory.txt
+*.so
+.Python
+*.egg-info/
+.eggs/
 
 # Node.js specific
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.npm
+.nuxt
+.next
+.vercel
+
+# Build outputs
+dist/
+build/
+public/dist/
+*.min.js
+*.min.css
 
 # OS generated files
 .DS_Store
