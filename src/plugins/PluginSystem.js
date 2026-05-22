@@ -161,3 +161,5 @@ export const builtinPlugins = [
     }
   }
 ];
+
+export default PluginSystem;

@@ -255,3 +255,5 @@ export class MemoryGraphEngine {
     };
   }
 }
+
+export default MemoryGraphEngine;

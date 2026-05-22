@@ -94,3 +94,5 @@ function test5() {
     process.exit(1);
   }
 })();
+
+export default test;

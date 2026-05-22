@@ -170,3 +170,5 @@ export class SafetyGovernor {
     console.log('🔒 Safety level set to:', level);
   }
 }
+
+export default SafetyGovernor;

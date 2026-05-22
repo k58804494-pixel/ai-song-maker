@@ -275,3 +275,5 @@ export class OrchestratorCore {
     this.taskQueue = [];
   }
 }
+
+export default OrchestratorCore;
