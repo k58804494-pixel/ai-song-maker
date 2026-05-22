@@ -7,41 +7,151 @@ dist/
 build/
 target/
 
-# Python cache
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.py~
+*.py.class
+*.py.backup
+*.py.swp
+*.py.swo
+*.py.tmp
+*.py.log
+*.py.env
+*.py.env.local
+*.py.env.
+*.py.vscode
+*.py.idea
+
+# Virtual environments
+venv/
+.venv/
+env/
+.ENV
 
 # Logs
 *.log
 
-# Environment variables
-.env
-.env.local
-.env.*
-
-# IDE files
-.vscode/
-.idea/
+# Temporary files
+*.tmp
+*.temp
 *.swp
 *.swo
 
-# OS files
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.
+*.env
+*.env.local
+*.env.
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.sublime-workspace
+*.sln
+*.csproj
+*.csproj.user
+*.vbproj
+*.vbproj.user
+*.userprefs
 
 # Coverage reports
 coverage/
 htmlcov/
 .coverage
+*.coveragerc
 
-# Package managers
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Testing
+.nyc_output/
+coverage/
+*.lcov
+*.profdata
+*.py.test
+pytest.ini
+tox.ini
 
-# Temporary files
-*.tmp
-*.temp
+# Distribution / packaging
+.Python
+*.egg-info/
+.installed.cfg
+*.egg
+*.whl
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
+# Compiled binary files
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.obj
+*.a
+*.lib
+*.out
+*.bin
+*.class
+*.jar
+*.war
+*.ear
+*.apk
+*.app
+*.msi
+*.deb
+*.rpm
+*.pkg
+*.dmg
+*.iso
+*.img
+*.vhd
+*.wim
+*.swf
+*.swc
+*.jar.pack
+*.pack
+*.pack.xz
+*.pack.gz
+*.pack.lzma
+*.pack.bzip2
+*.pack.bzip
+*.pack.bz2
+*.pack.bz
+*.pack.7z
+*.pack.rar
+*.pack.tar
+*.pack.tgz
+*.pack.tbz2
+*.pack.txz
+*.pack.tar.xz
+*.pack.tar.gz
+*.pack.tar.bz2
+*.pack.tar.zst
+*.pack.tar.lz4
+*.pack.tar.lzh
+*.pack.tar.cab
+*.pack.tar.arj
+*.pack.tar.rpm
+*.pack.tar.deb
+*.pack.tar.Z
+*.pack.tar.lz
+*.pack.tar.lzo
 ```

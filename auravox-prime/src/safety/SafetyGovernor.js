@@ -25,6 +25,10 @@ class SafetyGovernor {
     }
 
     async validate(input, options = {}) {
+        return this.evaluate(input, options); // Alias for backwards compatibility
+    }
+
+    async evaluate(input, options = {}) {
         const request = {
             id: this._generateId(),
             input: input.substring(0, 500),
