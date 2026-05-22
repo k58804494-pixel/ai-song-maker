@@ -1,0 +1,11 @@
+{
+  "metrics": {
+    "tasksCompleted": 0,
+    "errorsHandled": 0,
+    "averageResponseTime": 0,
+    "memoryPeaks": []
+  },
+  "completedTasksCount": 0,
+  "errorsHandled": 0,
+  "lastUpdated": 1779444463409
+}

@@ -1,0 +1,20 @@
+{
+  "name": "auravox",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AURAVOX - Master Autonomous AI Operating System",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node src/safety/test.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "anthropic": "^0.0.0",
+    "axios": "^1.16.1",
+    "openai": "^6.39.0",
+    "socket.io-client": "^4.8.3",
+    "uuid": "^9.0.0"
+  }
+}
