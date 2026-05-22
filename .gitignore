@@ -5,29 +5,43 @@ node_modules/
 # Build artifacts
 dist/
 build/
-*.js.map
+target/
 
-# Environment
-.env
-.env.local
-.env.*
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # Logs
 *.log
 
-# Temporary files
-*.tmp
-*.swp
+# Environment variables
+.env
+.env.local
+.env.*
 
-# IDE
+# IDE files
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# State files
-*.state.json
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
 
+# Package managers
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
 ```
