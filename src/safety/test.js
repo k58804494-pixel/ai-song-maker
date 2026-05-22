@@ -95,4 +95,3 @@ function test5() {
   }
 })();
 
-export default test;

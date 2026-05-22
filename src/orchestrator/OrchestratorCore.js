@@ -13,10 +13,13 @@ import { ReasoningEngine } from '../engines/ReasoningEngine.js';
 export class OrchestratorCore {
   constructor(auravox) {
     this.auravox = auravox;
+    this.config = auravox?.config || { mode: 'adaptive' };
     this.status = 'IDLE';
     this.activeAgents = new Map();
     this.taskQueue = [];
     this.executionHistory = [];
+    this.tasksCompleted = 0;
+    this.averageResponseTime = 0;
 
     // Initialize specialized agents
     this.agents = {
@@ -28,9 +31,59 @@ export class OrchestratorCore {
     };
 
     // Initialize reasoning engine
-    this.reasoningEngine = new ReasoningEngine(auravox.config.mode);
+    this.reasoningEngine = new ReasoningEngine(this.config.mode);
 
     console.log('🎯 Orchestrator Core initialized with ' + Object.keys(this.agents).length + ' agents');
+  }
+
+  /**
+   * Execute a single task directly
+   */
+  async executeTask(taskConfig) {
+    const startTime = Date.now();
+    
+    console.log(`📋 Executing task: ${taskConfig.description || taskConfig.type}`);
+    
+    try {
+      // Select appropriate agent based on task type
+      let agent = this.agents.builder; // default
+      
+      if (taskConfig.type === 'code_generation' || taskConfig.type === 'builder') {
+        agent = this.agents.builder;
+      } else if (taskConfig.type === 'architecture' || taskConfig.type === 'architect') {
+        agent = this.agents.architect;
+      } else if (taskConfig.type === 'design') {
+        agent = this.agents.designer;
+      } else if (taskConfig.type === 'review' || taskConfig.type === 'critic') {
+        agent = this.agents.critic;
+      } else if (taskConfig.type === 'deploy' || taskConfig.type === 'devops') {
+        agent = this.agents.devops;
+      }
+
+      const result = await agent.execute(taskConfig, 'adaptive');
+      const duration = Date.now() - startTime;
+      
+      this.tasksCompleted++;
+      this.updateAverageResponseTime(duration);
+      
+      return {
+        success: true,
+        result,
+        duration,
+        agent: agent.constructor.name
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        duration: Date.now() - startTime
+      };
+    }
+  }
+
+  updateAverageResponseTime(newDuration) {
+    const total = this.averageResponseTime * (this.tasksCompleted - 1) + newDuration;
+    this.averageResponseTime = total / this.tasksCompleted;
   }
 
   /**
@@ -254,15 +307,14 @@ export class OrchestratorCore {
   }
 
   /**
-   * Get orchestrator status
+   * Get orchestrator stats
    */
-  getStatus() {
+  getStats() {
     return {
       status: this.status,
-      activeAgents: this.activeAgents.size,
-      queuedTasks: this.taskQueue.length,
-      executedTasks: this.executionHistory.length,
-      agents: Object.keys(this.agents)
+      tasksCompleted: this.tasksCompleted,
+      activeAgents: Object.keys(this.agents).length,
+      averageResponseTime: `${Math.round(this.averageResponseTime)}ms`
     };
   }
 
