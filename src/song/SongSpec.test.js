@@ -7,7 +7,7 @@ test('createSongSpec accepts a plain prompt string', () => {
   const spec = createSongSpec('a happy summer pop song');
   assert.equal(spec.prompt, 'a happy summer pop song');
   assert.ok(Array.isArray(spec.structure) && spec.structure.length > 0);
-  assert.equal(spec.providers.music, 'mock');
+  assert.equal(spec.providers.music, 'synth'); // free, offline default
 });
 
 test('createSongSpec merges a partial spec and keeps defaults', () => {

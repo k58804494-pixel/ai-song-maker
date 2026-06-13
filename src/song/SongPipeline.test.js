@@ -5,6 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { SongPipeline } from './SongPipeline.js';
+import { createSongSpec } from './SongSpec.js';
+
+const createSongSpecDefault = () => createSongSpec('x').providers.music;
 
 async function tmpOutDir() {
   return mkdtemp(join(tmpdir(), 'auravox-test-'));
@@ -14,7 +17,8 @@ test('pipeline produces a real, non-empty WAV file from a prompt', async () => {
   const outDir = await tmpOutDir();
   const pipeline = new SongPipeline({ outDir, renderSeconds: 1 });
 
-  const { songSpec, lyrics, audio } = await pipeline.generateSong('a chill lofi beat');
+  // Force the deterministic mock backend so this stays a fast plumbing check.
+  const { songSpec, lyrics, audio } = await pipeline.generateSong({ prompt: 'a chill lofi beat', providers: { music: 'mock' } });
 
   // A real artifact exists on disk and is larger than a bare WAV header.
   const info = await stat(audio.filePath);
@@ -29,6 +33,7 @@ test('pipeline produces a real, non-empty WAV file from a prompt', async () => {
   // Spec + lyrics flowed through the pipeline.
   assert.equal(audio.provider, 'mock');
   assert.equal(songSpec.providers.music, 'mock');
+  assert.equal(createSongSpecDefault(), 'synth'); // default backend is the free synth
   assert.ok(lyrics.length > 0, 'lyrical sections should have lyrics');
 });
 

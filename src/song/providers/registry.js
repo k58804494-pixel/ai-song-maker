@@ -6,6 +6,7 @@
  * touching the pipeline or callers.
  */
 import { MockMusicProvider } from './MockMusicProvider.js';
+import { LocalSynthProvider } from './LocalSynthProvider.js';
 import { ReplicateMusicProvider } from './ReplicateMusicProvider.js';
 import { LocalMusicProvider } from './LocalMusicProvider.js';
 
@@ -48,6 +49,9 @@ export function resolveProvider(name) {
 }
 
 // Built-in providers.
+// Free + offline composing synth (default) — no model, no network, no cost.
+registerProvider('synth', () => new LocalSynthProvider());
+// Deterministic tiny-WAV backend kept for fast CI/unit assertions.
 registerProvider('mock', () => new MockMusicProvider());
 
 // Hosted: Replicate (open models like meta/musicgen). Needs REPLICATE_API_TOKEN.

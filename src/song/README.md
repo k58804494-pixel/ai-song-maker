@@ -16,14 +16,20 @@ generateSong(input)
 
 Choose a backend per stage via `SongSpec.providers.music` — no code change:
 
-| name | mode | requires | notes |
-|------|------|----------|-------|
-| `mock` | mock | nothing | writes a real sine-tone WAV; default; powers CI |
-| `replicate` / `hosted` | hosted | `REPLICATE_API_TOKEN` | runs open models (default `meta/musicgen`) |
-| `local` | local | `LOCAL_MUSIC_URL` | talks to the Python sidecar in `ml/` |
+| name | mode | requires | cost | notes |
+|------|------|----------|------|-------|
+| `synth` | local | nothing | **free** | **default.** Composes real instrumental music (chords+bass+melody+drums) fully offline — see `synth/` |
+| `mock` | mock | nothing | free | tiny deterministic sine-tone WAV; for fast CI/unit assertions |
+| `replicate` / `hosted` | hosted | `REPLICATE_API_TOKEN` | paid | runs open models (default `meta/musicgen`) |
+| `local` | local | `LOCAL_MUSIC_URL` | free* | talks to the Python sidecar in `ml/` (*one-time model download) |
+
+The default (`synth`) needs **no API key, no GPU, no payment** and runs anywhere.
 
 ```bash
-# mock (no setup)
+# free offline synth (default) — real composed music
+node src/song/cli.js "sunset drive" --genre synthwave --key "A minor" --tempo 110 --seconds 18
+
+# tiny mock tone (fast)
 node src/song/cli.js "a dreamy synthwave track" --provider mock --seconds 2
 
 # hosted

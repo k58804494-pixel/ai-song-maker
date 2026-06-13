@@ -56,7 +56,7 @@ export function createSongSpec(input = {}) {
     },
     providers: {
       lyrics: partial.providers?.lyrics || 'mock',
-      music: partial.providers?.music || 'mock',
+      music: partial.providers?.music || 'synth',
       vocals: partial.providers?.vocals || 'mock'
     },
     license: {
