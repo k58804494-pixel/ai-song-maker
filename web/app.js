@@ -254,32 +254,108 @@ function download() {
   URL.revokeObjectURL(url);
 }
 
+// ---- Neural (GPU) backend mode ----------------------------------------------
+
+function collectLyrics(spec) {
+  return spec.structure
+    .map((s) => (s.lyrics || '').trim())
+    .filter(Boolean)
+    .join('\n');
+}
+
+// Decode a base64 WAV from the backend into state.arrangement (so the existing
+// player, waveform and download all work unchanged).
+async function loadEncodedAudio(b64) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const ctx = ensureCtx();
+  const buf = await ctx.decodeAudioData(bytes.buffer);
+  state.arrangement = {
+    samples: Float32Array.from(buf.getChannelData(0)),
+    sampleRate: buf.sampleRate,
+    durationSec: buf.duration,
+    sections: [] // per-section editing is synth-mode only
+  };
+}
+
+async function generateNeural() {
+  const base = $('backendUrl').value.trim().replace(/\/+$/, '');
+  if (!base) {
+    $('status').textContent = 'Paste your Colab backend URL first (run the notebook to get it).';
+    return false;
+  }
+  state.spec = specFromControls();
+  state.spec.structure = generateLyrics(state.spec);
+  const body = {
+    prompt: state.spec.prompt,
+    genre: $('genre').value,
+    key: $('key').value,
+    tempo: Number($('tempo').value),
+    duration: Number($('secs').value),
+    vocals: $('vocals').checked,
+    lyrics: collectLyrics(state.spec),
+    format: 'wav'
+  };
+  $('status').textContent = 'Generating on GPU… first run downloads models (~2 min).';
+  const res = await fetch(base + '/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(`Backend error ${res.status}`);
+  const payload = await res.json();
+  if (!payload.audio_base64) throw new Error('Backend returned no audio');
+  await loadEncodedAudio(payload.audio_base64);
+  drawWave();
+  buildSectionList();
+  $('dur').textContent = fmtTime(state.arrangement.durationSec);
+  $('status').textContent = payload.has_vocals
+    ? 'Done — neural music + singing. (Per-section editing is synth-mode only.)'
+    : 'Done — neural instrumental.';
+  return true;
+}
+
 // ---- Wiring ------------------------------------------------------------------
 
 function generate() {
   const btn = $('generate');
+  const neural = $('neural').checked;
   btn.disabled = true;
-  btn.textContent = 'Composing…';
+  btn.textContent = neural ? 'Generating on GPU…' : 'Composing…';
   stop();
   state.offset = 0;
   // Defer so the button repaint is visible before the (sync) render.
-  setTimeout(() => {
-    state.spec = specFromControls();
-    state.spec.structure = generateLyrics(state.spec);
-    renderArrangement();
-    $('playerPanel').hidden = false;
-    $('sectionsPanel').hidden = false;
-    $('status').textContent = 'Done. Press play, or regenerate/lock sections below.';
-    $('cur').textContent = '0:00';
-    btn.disabled = false;
-    btn.textContent = 'Generate song';
-    ensureCtx();
-    play(0);
+  setTimeout(async () => {
+    try {
+      if (neural) {
+        const ok = await generateNeural();
+        if (!ok) return;
+      } else {
+        state.spec = specFromControls();
+        state.spec.structure = generateLyrics(state.spec);
+        renderArrangement();
+        $('sectionsPanel').hidden = false;
+        $('status').textContent = 'Done. Press play, or regenerate/lock sections below.';
+      }
+      $('playerPanel').hidden = false;
+      $('sectionsPanel').hidden = neural; // no per-section editor in neural mode
+      $('cur').textContent = '0:00';
+      ensureCtx();
+      play(0);
+    } catch (err) {
+      $('playerPanel').hidden = false;
+      $('status').textContent = `Failed: ${err.message}. Check the backend URL and that the Colab cell is still running.`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Generate song';
+    }
   }, 20);
 }
 
 $('tempo').addEventListener('input', (e) => { $('tempoOut').textContent = e.target.value; });
 $('secs').addEventListener('input', (e) => { $('secsOut').textContent = e.target.value; });
+$('neural').addEventListener('change', (e) => { $('neuralUrlRow').hidden = !e.target.checked; });
 $('generate').addEventListener('click', generate);
 $('playBtn').addEventListener('click', () => { if (state.playing) { state.offset = currentPlayhead(); stop(); } else play(); });
 $('download').addEventListener('click', download);
