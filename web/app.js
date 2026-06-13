@@ -300,7 +300,7 @@ async function generateNeural() {
   $('status').textContent = 'Generating on GPU… first run downloads models (~2 min).';
   const res = await fetch(base + '/generate', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
     body: JSON.stringify(body)
   });
   if (!res.ok) throw new Error(`Backend error ${res.status}`);
