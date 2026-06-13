@@ -25,9 +25,18 @@ Choose a backend per stage via `SongSpec.providers.music` — no code change:
 
 The default (`synth`) needs **no API key, no GPU, no payment** and runs anywhere.
 
+**Vocals:** the `synth` backend also *sings the lyrics* by default — a from-scratch
+formant vowel synth (`synth/voice.js`) pitches the lyric's vowels to the melody with
+vibrato. It's robotic (no trained model), but it's free and offline. Disable with
+`--no-vocals` (or `providers.vocals: 'none'`). Realistic neural singing (Piper/Bark) is
+a planned opt-in.
+
 ```bash
-# free offline synth (default) — real composed music
+# free offline synth (default) — real composed music + sung vocals
 node src/song/cli.js "sunset drive" --genre synthwave --key "A minor" --tempo 110 --seconds 18
+
+# instrumental only
+node src/song/cli.js "sunset drive" --genre synthwave --no-vocals --seconds 18
 
 # tiny mock tone (fast)
 node src/song/cli.js "a dreamy synthwave track" --provider mock --seconds 2

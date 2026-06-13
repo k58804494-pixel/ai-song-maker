@@ -38,7 +38,11 @@ export class LocalSynthProvider extends BaseMusicProvider {
     const startTime = Date.now();
     const maxSeconds = Math.min(opts.renderSeconds ?? 30, songSpec.durationSec);
 
-    const { samples, sampleRate, durationSec, bars, bpm, progression } = arrange(songSpec, { maxSeconds });
+    // Sing the lyrics unless vocals are explicitly disabled ('none'/empty).
+    const vocalsSetting = songSpec.providers?.vocals;
+    const vocals = Boolean(vocalsSetting) && vocalsSetting !== 'none';
+
+    const { samples, sampleRate, durationSec, bars, bpm, progression } = arrange(songSpec, { maxSeconds, vocals });
     const wav = encodeWav(samples, sampleRate);
 
     const outDir = opts.outDir || join(tmpdir(), 'auravox-songs');
@@ -69,7 +73,8 @@ export class LocalSynthProvider extends BaseMusicProvider {
         bpm,
         key: songSpec.key,
         genre: songSpec.genre,
-        progression
+        progression,
+        vocals
       }
     };
   }

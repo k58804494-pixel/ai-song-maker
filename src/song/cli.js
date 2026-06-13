@@ -9,7 +9,7 @@
 import { SongPipeline } from './SongPipeline.js';
 
 function parseArgs(argv) {
-  const args = { provider: 'synth', seconds: 20, out: undefined, prompt: '', genre: undefined, key: undefined, tempo: undefined };
+  const args = { provider: 'synth', seconds: 20, out: undefined, prompt: '', genre: undefined, key: undefined, tempo: undefined, vocals: undefined };
   const rest = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -19,6 +19,7 @@ function parseArgs(argv) {
     else if (a === '--genre') args.genre = argv[++i];
     else if (a === '--key') args.key = argv[++i];
     else if (a === '--tempo') args.tempo = Number(argv[++i]);
+    else if (a === '--no-vocals') args.vocals = 'none';
     else rest.push(a);
   }
   args.prompt = rest.join(' ').trim();
@@ -28,7 +29,7 @@ function parseArgs(argv) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.prompt) {
-    console.error('Usage: node src/song/cli.js "<prompt>" [--provider synth|mock|replicate|local] [--genre G] [--key "A minor"] [--tempo N] [--seconds N] [--out DIR]');
+    console.error('Usage: node src/song/cli.js "<prompt>" [--provider synth|mock|replicate|local] [--genre G] [--key "A minor"] [--tempo N] [--seconds N] [--no-vocals] [--out DIR]');
     process.exit(1);
   }
 
@@ -38,7 +39,7 @@ async function main() {
     genre: args.genre,
     key: args.key,
     tempo: args.tempo,
-    providers: { music: args.provider }
+    providers: { music: args.provider, ...(args.vocals ? { vocals: args.vocals } : {}) }
   });
 
   console.log(`🎵 ${audio.provider} (${audio.mode}) → ${audio.filePath}`);
