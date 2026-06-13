@@ -53,6 +53,16 @@
         <span>Sing the lyrics (vocals)</span>
       </label>
 
+      <label class="check full neural-toggle">
+        <input id="neural" type="checkbox" />
+        <span>Neural (GPU) mode — real AI music + singing via a Colab backend</span>
+      </label>
+
+      <label class="full neural-url" id="neuralUrlRow" hidden>
+        <span>GPU backend URL <small>(from the Colab notebook, e.g. https://&hellip;.trycloudflare.com)</small></span>
+        <input id="backendUrl" type="text" placeholder="https://something.trycloudflare.com" />
+      </label>
+
       <button id="generate" class="primary">Generate song</button>
     </section>
 
