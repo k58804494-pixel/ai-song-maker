@@ -1,0 +1,7 @@
+# Local ML sidecar (text-to-music) — see ml/server.py
+fastapi>=0.110
+uvicorn>=0.29
+# MusicGen + audio IO. GPU strongly recommended.
+audiocraft>=1.3.0
+torch>=2.1
+torchaudio>=2.1

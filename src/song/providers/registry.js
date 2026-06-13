@@ -6,6 +6,8 @@
  * touching the pipeline or callers.
  */
 import { MockMusicProvider } from './MockMusicProvider.js';
+import { ReplicateMusicProvider } from './ReplicateMusicProvider.js';
+import { LocalMusicProvider } from './LocalMusicProvider.js';
 
 const factories = new Map();
 
@@ -47,3 +49,10 @@ export function resolveProvider(name) {
 
 // Built-in providers.
 registerProvider('mock', () => new MockMusicProvider());
+
+// Hosted: Replicate (open models like meta/musicgen). Needs REPLICATE_API_TOKEN.
+registerProvider('replicate', () => new ReplicateMusicProvider());
+registerProvider('hosted', () => new ReplicateMusicProvider());
+
+// Local/open: talks to the Python ML sidecar in ml/. Needs LOCAL_MUSIC_URL.
+registerProvider('local', () => new LocalMusicProvider());
