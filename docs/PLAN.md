@@ -147,9 +147,15 @@ This is what powers the "commercial‑safe" and "no credit wall" differentiators
   - Define `SongSpec` schema + validation; provider interface; job/queue skeleton; storage abstraction.
   - Replace the stub `generateMusic()` with a real pipeline entrypoint backed by a **mock provider** that returns a tiny real audio file (silence/tone) so the whole flow is testable end‑to‑end.
 
-- **M1 — First real song (vertical slice)**
-  - Lyrics (LLM) → single hosted text‑to‑song provider → **playable audio file** for a one‑line prompt.
-  - Minimal UI: prompt in, audio out, library of generations.
+- **M1 — First real song (vertical slice)** — *decided: both hosted + local behind the provider abstraction*
+  - Ship **two interchangeable providers** behind the same interface from day one: one **hosted** backend
+    (fastest path to good audio) and one **local/open** backend (no credit wall, private), plus the
+    **mock** provider for CI. Selectable per‑stage via `SongSpec.providers`.
+  - Lyrics (LLM) → selected text‑to‑song provider → **playable audio file** for a one‑line prompt.
+  - Minimal UI: prompt in, audio out, provider picker, library of generations.
+  - Rationale: locking the provider interface now (rather than wiring one vendor) prevents rework and
+    makes the hosted↔local swap a config change, not a refactor. Local model *quality/perf hardening*
+    still lands in M5; M1 only proves the abstraction works end‑to‑end with at least one of each.
 
 - **M2 — Structure & control**
   - Section‑aware generation from `structure[]`; lyric editor with `[Verse]/[Chorus]` tags;
@@ -163,9 +169,10 @@ This is what powers the "commercial‑safe" and "no credit wall" differentiators
   - Chord/melody/MIDI scaffold stage; condition audio on it; target jazz/orchestral/complex meter
     where Suno is weak. MIDI export.
 
-- **M5 — Local/open mode + provenance**
-  - Local model backends (DiffRhythm/ACE‑Step/MusicGen/Bark) on GPU; C2PA content credentials,
-    audio watermarking, per‑song license manifest.
+- **M5 — Local/open mode hardening + provenance**
+  - Production‑grade local backends (DiffRhythm/ACE‑Step/MusicGen/Bark) on GPU — quality, latency,
+    batching, model management (the M1 local provider is a minimal proof‑of‑concept); C2PA content
+    credentials, audio watermarking, per‑song license manifest.
 
 - **M6 — Personas, multilingual, mastering profiles, DAW export**
   - Consent‑gated voice personas; multilingual lyric/phoneme support; mastering presets
@@ -212,6 +219,6 @@ Because output quality is subjective, we combine deterministic tests with object
 3. Real `generateMusic()` entrypoint wired to the mock provider + first unit/integration tests.
 4. M1 vertical slice behind one hosted provider + minimal UI.
 
-> Open question for kamil: do you want to prioritize **local/open models** (no API costs, fully
-> self‑hosted) or **hosted APIs** (fastest path to great‑sounding songs) for the first playable
-> version? This decision drives M1.
+> **Decision (kamil):** support **both hosted and local/open models behind the provider abstraction**
+> from M1. The provider interface is the stable contract; choosing a backend is a per‑stage config
+> value in `SongSpec.providers`, not a code change.
