@@ -6,7 +6,7 @@
  * reproducible and testable. 100% offline, no model, no network.
  */
 import { chordForDegree, progressionForGenre, scaleNotes, midiToFreq } from './theory.js';
-import { makeRng, hashSeed, renderNote, renderDrum, normalize } from './synth.js';
+import { makeRng, hashSeed, renderNote, renderDrum, masterBus } from './synth.js';
 import { makeVowelCursor, renderVowel } from './voice.js';
 
 const BEATS_PER_BAR = 4;
@@ -18,7 +18,7 @@ const NON_MELODIC = new Set(['Intro', 'Outro']);
  * @param {number} [opts.sampleRate=44100]
  * @param {number} [opts.maxSeconds=45]  cap render length
  * @param {boolean} [opts.vocals=false]  render a sung vocal lead from lyrics
- * @returns {{ samples: Float32Array, sampleRate: number, durationSec: number, bars: number, bpm: number, progression: number[], vocals: boolean }}
+ * @returns {{ samples: Float32Array, sampleRate: number, durationSec: number, bars: number, bpm: number, progression: number[], vocals: boolean, sections: Array }}
  */
 export function arrange(songSpec, opts = {}) {
   const sampleRate = opts.sampleRate ?? 44100;
@@ -29,9 +29,26 @@ export function arrange(songSpec, opts = {}) {
   const secPerBeat = 60 / bpm;
   const barDur = secPerBeat * BEATS_PER_BAR;
 
-  const rng = makeRng(hashSeed(`${songSpec.prompt}|${songSpec.key}|${songSpec.genre}|${songSpec.mood}`));
+  const seedBase = `${songSpec.prompt}|${songSpec.key}|${songSpec.genre}|${songSpec.mood}`;
   const progression = progressionForGenre(songSpec.genre);
   const scale = scaleNotes(songSpec.key, 5); // melody register
+
+  // Drums use one stable RNG for the whole song, independent of any section's
+  // melody seed — so regenerating a section never changes the beat.
+  const drumRng = makeRng(hashSeed(`${seedBase}|drums`));
+
+  // Each section gets its OWN melody RNG, seeded only by that section's identity
+  // and its `seed`. This makes sections independent: regenerating one (bumping
+  // its seed) or locking it leaves every other section's audio bit-identical.
+  const melodyRngs = new Map();
+  const sectionRng = (sectionId) => {
+    if (!melodyRngs.has(sectionId)) {
+      const section = songSpec.structure[sectionId];
+      const seed = section.seed ?? 0;
+      melodyRngs.set(sectionId, makeRng(hashSeed(`${seedBase}|sec${sectionId}|${section.section}|seed${seed}`)));
+    }
+    return melodyRngs.get(sectionId);
+  };
 
   // Flatten sections into a bar list, capped to maxSeconds.
   const maxBars = Math.max(1, Math.floor(maxSeconds / barDur));
@@ -59,6 +76,7 @@ export function arrange(songSpec, opts = {}) {
     const { name: sectionName, sectionId } = barPlan[bar];
     const nextVowel = cursors.get(sectionId);
     const barStart = bar * barDur;
+    const srng = sectionRng(sectionId);
     const degree = progression[bar % progression.length];
     const chord = chordForDegree(songSpec.key, degree, 4);
 
@@ -87,8 +105,8 @@ export function arrange(songSpec, opts = {}) {
       const pool = [...chord.notes.map((n) => n + 12), ...scale];
       const melodyGain = vocals ? 0.05 : 0.14;
       for (let eighth = 0; eighth < BEATS_PER_BAR * 2; eighth++) {
-        if (rng() < 0.35) continue; // rest
-        const note = pool[Math.floor(rng() * pool.length)];
+        if (srng() < 0.35) continue; // rest
+        const note = pool[Math.floor(srng() * pool.length)];
         const startSec = barStart + eighth * (secPerBeat / 2);
         renderNote(samples, {
           freq: midiToFreq(note), startSec,
@@ -109,16 +127,39 @@ export function arrange(songSpec, opts = {}) {
     for (let beat = 0; beat < BEATS_PER_BAR; beat++) {
       const beatStart = barStart + beat * secPerBeat;
       if (drums === 'full') {
-        if (beat % 2 === 0) renderDrum(samples, { type: 'kick', startSec: beatStart, sampleRate, gain: 0.6, rng });
-        else renderDrum(samples, { type: 'snare', startSec: beatStart, sampleRate, gain: 0.45, rng });
+        if (beat % 2 === 0) renderDrum(samples, { type: 'kick', startSec: beatStart, sampleRate, gain: 0.6, rng: drumRng });
+        else renderDrum(samples, { type: 'snare', startSec: beatStart, sampleRate, gain: 0.45, rng: drumRng });
       }
       // hi-hats on eighths
-      renderDrum(samples, { type: 'hat', startSec: beatStart, sampleRate, gain: 0.18, rng });
-      renderDrum(samples, { type: 'hat', startSec: beatStart + secPerBeat / 2, sampleRate, gain: 0.14, rng });
+      renderDrum(samples, { type: 'hat', startSec: beatStart, sampleRate, gain: 0.18, rng: drumRng });
+      renderDrum(samples, { type: 'hat', startSec: beatStart + secPerBeat / 2, sampleRate, gain: 0.14, rng: drumRng });
     }
   }
 
-  normalize(samples, 0.89);
+  // Content-independent master bus (NOT peak normalization): keeps per-section
+  // edits from rescaling the rest of the mix, so locked sections stay bit-exact.
+  masterBus(samples, { drive: 1.1, out: 0.95 });
 
-  return { samples, sampleRate, durationSec, bars: totalBars, bpm, progression, vocals };
+  // Group contiguous bars into per-section time ranges (for the editor/UI).
+  const sections = [];
+  for (let bar = 0; bar < totalBars; bar++) {
+    const { name, sectionId } = barPlan[bar];
+    const last = sections[sections.length - 1];
+    if (last && last.sectionId === sectionId) {
+      last.bars += 1;
+      last.durSec += barDur;
+    } else {
+      sections.push({
+        sectionId,
+        name,
+        startSec: bar * barDur,
+        durSec: barDur,
+        bars: 1,
+        locked: Boolean(songSpec.structure[sectionId]?.locked),
+        seed: songSpec.structure[sectionId]?.seed ?? 0
+      });
+    }
+  }
+
+  return { samples, sampleRate, durationSec, bars: totalBars, bpm, progression, vocals, sections };
 }

@@ -48,6 +48,27 @@ REPLICATE_API_TOKEN=r8_... node src/song/cli.js "lofi beat" --provider replicate
 LOCAL_MUSIC_URL=http://127.0.0.1:8000/generate node src/song/cli.js "jazz" --provider local
 ```
 
+## Section editor (regenerate / lock)
+
+Each section composes from its **own seed**, so you can regenerate one
+Verse/Chorus for a fresh variation while locking the rest — and the locked
+sections stay **bit-identical** (the mix uses a content-independent master bus,
+not peak normalization, so editing one region never rescales the others).
+
+```js
+import { regenerateSection, lockSection, setSectionLyrics } from './editor.js';
+import { arrange } from './synth/arranger.js';
+
+let spec = createSongSpec({ prompt: 'city lights', genre: 'synthwave', key: 'A minor' });
+spec = lockSection(spec, 1);            // keep Verse 1 exactly as-is
+spec = regenerateSection(spec, 2);      // new Chorus variation (bumps its seed)
+const { samples, sections } = arrange(spec, { vocals: true });
+// `sections` = [{ sectionId, name, startSec, durSec, bars, locked, seed }, ...]
+```
+
+All editor functions are pure (return a new SongSpec). `regenerateSection` is a
+no-op on a locked section unless `{ force: true }`.
+
 ## Tests
 
 ```bash
