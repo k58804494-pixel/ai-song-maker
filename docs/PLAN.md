@@ -162,8 +162,11 @@ This is what powers the "commercial‑safe" and "no credit wall" differentiators
     progressions per genre/key + bass + melody + drum synthesis, arranged over the song structure and
     mixed to a real WAV. **No API key, no GPU, no payment**, runs anywhere (incl. CI). See `src/song/synth/`.
   - Paid/hosted (`replicate`) and heavier local‑model (`local`) backends stay opt‑in for higher fidelity.
-  - Honest gap: realistic neural *singing vocals* still need a trained model — free options (Piper/Bark,
-    one‑time download, no payment) are the planned next step; the synth covers instrumentals today.
+  - **Free vocals (from scratch):** a formant vowel synth (`synth/voice.js`) *sings the lyrics' vowels*
+    on the melody (with vibrato) and is mixed in as the lead by default — no model, no download, no payment.
+    Robotic in timbre (it's not a trained voice), toggled off with `--no-vocals`.
+  - Honest gap: *natural, word‑intelligible* singing still needs a trained model — free options (Piper/Bark,
+    one‑time download, no payment) are the planned opt‑in upgrade; the from‑scratch voice covers "sung melody" today.
 
 - **M2 — Structure & control**
   - Section‑aware generation from `structure[]`; lyric editor with `[Verse]/[Chorus]` tags;

@@ -37,6 +37,28 @@ test('arrange is deterministic for the same spec', () => {
   }
 });
 
+test('vocals add energy and stay deterministic', () => {
+  const spec = createSongSpec({ prompt: 'sing to me', genre: 'pop', key: 'C major', tempo: 120 });
+  const dry = arrange(spec, { maxSeconds: 6, vocals: false });
+  const sung = arrange(spec, { maxSeconds: 6, vocals: true });
+
+  assert.equal(sung.vocals, true);
+  assert.equal(dry.vocals, false);
+
+  const energy = (s) => { let e = 0; for (let i = 0; i < s.length; i++) e += s[i] * s[i]; return e; };
+  // Both are normalized to the same peak; the sung mix is a different signal.
+  let diff = 0;
+  for (let i = 0; i < Math.min(dry.samples.length, sung.samples.length); i += 257) {
+    if (dry.samples[i] !== sung.samples[i]) diff++;
+  }
+  assert.ok(diff > 0, 'vocal track should change the rendered audio');
+  assert.ok(energy(sung.samples) > 0);
+
+  // Deterministic with vocals on.
+  const sung2 = arrange(spec, { maxSeconds: 6, vocals: true });
+  for (let i = 0; i < sung.samples.length; i += 997) assert.equal(sung.samples[i], sung2.samples[i]);
+});
+
 test('makeRng is deterministic and seed-sensitive', () => {
   const r1 = makeRng(hashSeed('abc'));
   const r2 = makeRng(hashSeed('abc'));
