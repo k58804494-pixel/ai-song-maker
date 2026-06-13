@@ -3,6 +3,8 @@
  * Handles cinematic content creation pipeline
  */
 
+import { SongPipeline } from '../song/SongPipeline.js';
+
 class MediaGenerationEngine {
   constructor() {
     this.generators = new Map();
@@ -138,41 +140,34 @@ class MediaGenerationEngine {
   }
 
   /**
-   * Generate music/soundtrack
+   * Generate music/soundtrack.
+   *
+   * Backed by the real {@link SongPipeline} (normalize → validate → lyrics →
+   * music provider) instead of the previous simulated placeholder. The provider
+   * is selected via `SongSpec.providers.music` ('mock' by default in M0).
+   *
+   * @param {string|object} options  prompt string or partial SongSpec
+   * @param {object} [pipelineOpts]   forwarded to SongPipeline (outDir, renderSeconds)
    */
-  async generateMusic(options = {}) {
-    const startTime = Date.now();
-    
-    const config = {
-      genre: options.genre || 'cinematic',
-      mood: options.mood || 'epic',
-      duration: options.duration || 120,
-      bpm: options.bpm || 120,
-      key: options.key || 'C major',
-      instruments: options.instruments || ['strings', 'brass', 'percussion'],
-      layers: options.layers || 4
+  async generateMusic(options = {}, pipelineOpts = {}) {
+    // Back-compat: map the old options shape onto SongSpec fields.
+    const spec = typeof options === 'string' ? { prompt: options } : {
+      prompt: options.prompt,
+      genre: options.genre,
+      mood: options.mood,
+      durationSec: options.durationSec ?? options.duration,
+      tempo: options.tempo ?? options.bpm,
+      key: options.key,
+      providers: options.providers
     };
-    
-    // Simulated music generation
-    const result = {
-      id: `mus_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      type: 'music',
-      config,
-      url: '[Generated audio URL]',
-      waveform: '[Waveform data]',
-      duration: config.duration,
-      renderTime: Date.now() - startTime,
-      metadata: {
-        model: 'auravox-music-v1',
-        stems: config.layers,
-        loopable: true
-      }
-    };
-    
+
+    const pipeline = new SongPipeline(pipelineOpts);
+    const { songSpec, lyrics, audio } = await pipeline.generateSong(spec);
+
     this.stats.totalGenerations++;
     this.stats.byType.musicGeneration++;
-    
-    return result;
+
+    return { ...audio, songSpec, lyrics };
   }
 
   /**
