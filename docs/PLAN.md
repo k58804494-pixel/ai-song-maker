@@ -168,9 +168,12 @@ This is what powers the "commercial‑safe" and "no credit wall" differentiators
   - Honest gap: *natural, word‑intelligible* singing still needs a trained model — free options (Piper/Bark,
     one‑time download, no payment) are the planned opt‑in upgrade; the from‑scratch voice covers "sung melody" today.
 
-- **M2 — Structure & control**
-  - Section‑aware generation from `structure[]`; lyric editor with `[Verse]/[Chorus]` tags;
-    **regenerate‑section** and **section lock**; extend/continue.
+- **M2 — Structure & control** — *core shipped (free/offline)*
+  - Section‑aware generation from `structure[]`; **regenerate‑section** and **section lock** with a
+    per‑section `seed`. Each section composes from its own seed and the mix uses a content‑independent
+    master bus (not peak normalization), so regenerating one section leaves locked sections **bit‑identical**.
+    `arrange()` returns per‑section time ranges for the UI. See `src/song/editor.js`.
+  - Remaining: lyric‑editor UI with `[Verse]/[Chorus]` tags; extend/continue.
 
 - **M3 — Quality moat: dual‑track + critique loop**
   - Separate vocals/accompaniment; **stems** via Demucs; CriticAgent QA (ASR lyric WER, LUFS,

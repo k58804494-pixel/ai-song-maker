@@ -111,3 +111,17 @@ export function normalize(buffer, target = 0.89) {
   }
   return buffer;
 }
+
+/**
+ * Content-independent master bus: a fixed drive + tanh soft-clip + output trim.
+ * Unlike peak normalization, each output sample depends ONLY on its own input
+ * sample — so editing one region of the mix never changes any other region.
+ * This is what makes per-section regenerate/lock bit-exact.
+ * Mutates and returns the buffer.
+ */
+export function masterBus(buffer, { drive = 1.1, out = 0.95 } = {}) {
+  for (let i = 0; i < buffer.length; i++) {
+    buffer[i] = Math.tanh(buffer[i] * drive) * out;
+  }
+  return buffer;
+}

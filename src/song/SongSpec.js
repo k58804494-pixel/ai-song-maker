@@ -35,9 +35,10 @@ export function createSongSpec(input = {}) {
         section: s.section,
         bars: s.bars ?? 8,
         lyrics: s.lyrics ?? null,
-        locked: Boolean(s.locked)
+        locked: Boolean(s.locked),
+        seed: Number.isFinite(s.seed) ? s.seed : 0
       }))
-    : DEFAULT_STRUCTURE.map((s) => ({ ...s, lyrics: null, locked: false }));
+    : DEFAULT_STRUCTURE.map((s) => ({ ...s, lyrics: null, locked: false, seed: 0 }));
 
   return {
     title: partial.title || 'Untitled',
