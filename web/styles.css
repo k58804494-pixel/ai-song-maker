@@ -1,0 +1,108 @@
+:root {
+  --bg: #0b0d17;
+  --panel: #151829;
+  --panel-2: #1d2138;
+  --ink: #e9ecf5;
+  --muted: #8a90ad;
+  --accent: #7c5cff;
+  --accent-2: #19d3c5;
+  --lock: #ffb347;
+  --line: #2a2f4a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: radial-gradient(1200px 600px at 70% -10%, #1b2042 0%, var(--bg) 55%);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+.app { max-width: 880px; margin: 0 auto; padding: 32px 20px 60px; }
+
+.hero h1 { font-size: 2.4rem; margin: 0 0 6px; letter-spacing: -0.5px; }
+.hero .spark {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.tagline { color: var(--muted); margin: 0 0 24px; line-height: 1.5; }
+.tagline strong { color: var(--accent-2); }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.controls .full { grid-column: 1 / -1; }
+.controls label { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: var(--muted); }
+.controls label.check { flex-direction: row; align-items: center; gap: 10px; color: var(--ink); }
+.controls input[type="text"], .controls select {
+  background: var(--panel-2); border: 1px solid var(--line); color: var(--ink);
+  border-radius: 10px; padding: 11px 12px; font-size: 0.95rem; outline: none;
+}
+.controls input[type="text"]:focus, .controls select:focus { border-color: var(--accent); }
+.controls input[type="range"] { accent-color: var(--accent); }
+.controls output { color: var(--ink); font-weight: 600; }
+
+button { cursor: pointer; font-family: inherit; }
+.primary {
+  grid-column: 1 / -1;
+  background: linear-gradient(90deg, var(--accent), #5d7bff);
+  color: white; border: 0; border-radius: 12px; padding: 14px;
+  font-size: 1.05rem; font-weight: 600; transition: transform .06s ease, filter .2s;
+}
+.primary:hover { filter: brightness(1.08); }
+.primary:active { transform: translateY(1px); }
+.primary:disabled { opacity: 0.6; cursor: progress; }
+
+.transport { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+.play {
+  width: 52px; height: 52px; border-radius: 50%; border: 0; font-size: 1.2rem;
+  background: var(--accent-2); color: #06231f; font-weight: 700;
+}
+.time { color: var(--muted); font-variant-numeric: tabular-nums; }
+.ghost {
+  margin-left: auto; background: transparent; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px;
+}
+.ghost:hover { border-color: var(--accent-2); }
+
+#wave { width: 100%; display: block; background: var(--panel-2); border-radius: 10px; cursor: pointer; }
+.status { color: var(--muted); font-size: 0.82rem; margin-top: 10px; min-height: 1em; }
+
+.sections h2 { font-size: 1.05rem; margin: 0 0 14px; }
+.sections h2 small { color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 0.8rem; }
+#sectionList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.sec {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 12px; padding: 12px 14px;
+}
+.sec.locked { border-color: var(--lock); }
+.sec .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex: none; }
+.sec .meta { display: flex; flex-direction: column; }
+.sec .name { font-weight: 600; }
+.sec .range { color: var(--muted); font-size: 0.78rem; }
+.sec .spacer { flex: 1; }
+.sec button {
+  background: transparent; border: 1px solid var(--line); color: var(--ink);
+  border-radius: 9px; padding: 8px 12px; font-size: 0.85rem;
+}
+.sec button:hover { border-color: var(--accent); }
+.sec button.on { background: var(--lock); color: #2a1c00; border-color: var(--lock); }
+.sec button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.foot { color: var(--muted); font-size: 0.78rem; text-align: center; margin-top: 24px; }
+
+@media (max-width: 600px) { .controls { grid-template-columns: 1fr; } }

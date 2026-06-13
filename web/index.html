@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AURAVOX — Free AI Song Maker</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <h1>AURAVOX <span class="spark">Song Maker</span></h1>
+      <p class="tagline">Type an idea &rarr; hear a full song. Composed &amp; sung in your browser.
+        <strong>100% free</strong> — no API key, no GPU, no server.</p>
+    </header>
+
+    <section class="panel controls">
+      <label class="full">
+        <span>Prompt</span>
+        <input id="prompt" type="text" value="city lights at midnight" placeholder="a hopeful pop anthem about new beginnings" />
+      </label>
+
+      <label>
+        <span>Genre</span>
+        <select id="genre">
+          <option>pop</option><option selected>synthwave</option><option>rock</option>
+          <option>lofi</option><option>jazz</option><option>edm</option>
+          <option>cinematic</option><option>folk</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Key</span>
+        <select id="key">
+          <option>C major</option><option selected>A minor</option><option>G major</option>
+          <option>E minor</option><option>D major</option><option>F major</option>
+          <option>B minor</option><option>D minor</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Tempo <output id="tempoOut">110</output> BPM</span>
+        <input id="tempo" type="range" min="60" max="170" value="110" />
+      </label>
+
+      <label>
+        <span>Length <output id="secsOut">18</output>s</span>
+        <input id="secs" type="range" min="6" max="40" value="18" />
+      </label>
+
+      <label class="check">
+        <input id="vocals" type="checkbox" checked />
+        <span>Sing the lyrics (vocals)</span>
+      </label>
+
+      <button id="generate" class="primary">Generate song</button>
+    </section>
+
+    <section class="panel player" id="playerPanel" hidden>
+      <div class="transport">
+        <button id="playBtn" class="play">▶</button>
+        <div class="time"><span id="cur">0:00</span> / <span id="dur">0:00</span></div>
+        <button id="download" class="ghost">Download WAV</button>
+      </div>
+      <canvas id="wave" height="120"></canvas>
+      <div id="status" class="status"></div>
+    </section>
+
+    <section class="panel sections" id="sectionsPanel" hidden>
+      <h2>Sections <small>regenerate a part, or lock it to keep it</small></h2>
+      <ul id="sectionList"></ul>
+    </section>
+
+    <footer class="foot">
+      Engine: from-scratch music theory + synthesis + formant vocals. Deterministic per prompt.
+    </footer>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
