@@ -157,6 +157,14 @@ This is what powers the "commercial‑safe" and "no credit wall" differentiators
     makes the hosted↔local swap a config change, not a refactor. Local model *quality/perf hardening*
     still lands in M5; M1 only proves the abstraction works end‑to‑end with at least one of each.
 
+- **M1.5 — Free-first default (`synth` provider)** — *added per kamil: "make it fully from scratch so I don't pay for anything"*
+  - A from‑scratch, dependency‑free composing synth is now the **default** backend: music‑theory chord
+    progressions per genre/key + bass + melody + drum synthesis, arranged over the song structure and
+    mixed to a real WAV. **No API key, no GPU, no payment**, runs anywhere (incl. CI). See `src/song/synth/`.
+  - Paid/hosted (`replicate`) and heavier local‑model (`local`) backends stay opt‑in for higher fidelity.
+  - Honest gap: realistic neural *singing vocals* still need a trained model — free options (Piper/Bark,
+    one‑time download, no payment) are the planned next step; the synth covers instrumentals today.
+
 - **M2 — Structure & control**
   - Section‑aware generation from `structure[]`; lyric editor with `[Verse]/[Chorus]` tags;
     **regenerate‑section** and **section lock**; extend/continue.
